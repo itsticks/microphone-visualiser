@@ -38,7 +38,7 @@ clipLag: how long you would like the "clipping" indicator to show
 Access the clipping through node.checkClipping(); use node.shutdown to get rid of it.
 */
 
-function createAudioMeter(audioContext,clipLevel,averaging,clipLag) {
+function createVolumeMeter(audioContext,clipLevel,averaging,clipLag) {
 	var processor = audioContext.createScriptProcessor(512);
 	processor.onaudioprocess = volumeAudioProcess;
 	processor.clipping = false;
@@ -50,7 +50,6 @@ function createAudioMeter(audioContext,clipLevel,averaging,clipLag) {
 
 	// this will have no effect, since we don't copy the input to the output,
 	// but works around a current Chrome bug.
-	processor.connect(audioContext.destination);
 
 	processor.checkClipping =
 		function(){
