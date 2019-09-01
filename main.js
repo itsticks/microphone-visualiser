@@ -1,120 +1,56 @@
-/*
-The MIT License (MIT)
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
-Copyright (c) 2014 Chris Wilson
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
 var audioContext = null;
 var meter = null;
-var canvasContext = null;
-var WIDTH=500;
-var HEIGHT=50;
-var rafID = null;
-
+var ctx = null;
+var step = null;
+var canvas = document.createElement( "canvas" );
 var startButton = document.createElement('button');
-startButton.innerHTML = 'start';
 
-
+startButton.innerHTML = 'Enable microphone';
 document.body.append(startButton);
 
-startButton.onclick = function() {
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+document.body.append(canvas);
 
-    // grab our canvas
-    meter = document.getElementById( "meter" );
-    canvasContext = meter.getContext("2d");
+
+
+startButton.onclick = function() {
+startButton.style.display = 'none';
+   
+    ctx = canvas.getContext("2d");
     
-    meter.width = window.innerWidth;
-    meter.height = window.innerHeight;
-	
-    // monkeypatch Web Audio
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-	
-    // grab an audio context
     audioContext = new AudioContext();
 
-    // Attempt to get audio input
-    try {
-        // monkeypatch getUserMedia
-        navigator.getUserMedia = 
-        	navigator.getUserMedia ||
-        	navigator.webkitGetUserMedia ||
-        	navigator.mozGetUserMedia;
-
-        // ask for an audio input
-        navigator.getUserMedia(
-        {
-            "audio": {
-                "mandatory": {
-                    "googEchoCancellation": "false",
-                    "googAutoGainControl": "false",
-                    "googNoiseSuppression": "false",
-                    "googHighpassFilter": "false"
-                },
-                "optional": []
-            },
-        }, gotStream, didntGetStream);
-    } catch (e) {
-        alert('getUserMedia threw exception :' + e);
-    }
-
-}
-
-
-function didntGetStream() {
-    alert('Stream generation failed.');
-}
-
-var mediaStreamSource = null;
-
-function gotStream(stream) {
-    // Create an AudioNode from the stream.
+navigator.mediaDevices.getUserMedia({audio:{
+    sampleSize: 8,
+    echoCancellation: false,
+    autoGainControl:false,
+    noiseSuppression:false,
+    highpassFilter:false
+  }})
+.then(function(stream) {
     mediaStreamSource = audioContext.createMediaStreamSource(stream);
-
-    // Create a new volume meter and connect it.
     meter = createAudioMeter(audioContext);
     mediaStreamSource.connect(meter);
+    volumeCircle();
+})
 
-    // kick off the visual updating
-    drawLoop();
 }
 
-function drawLoop( time ) {
+function volumeCircle() {
 
 var randomR = Math.random() * 255;
 var randomB = Math.random() * 255;
 var randomG = Math.random() * 255;
 
-    // clear the background
-  //  canvasContext.clearRect(0,0,WIDTH,HEIGHT);
-  canvasContext.globalAlpha = 0.1;
-    // check if we're currently clipping
-
-        canvasContext.fillStyle = "rgb("+randomR+","+randomB+","+randomG+")";
-        canvasContext.beginPath();
-        canvasContext.arc(window.innerWidth/2, window.innerHeight/2, meter.volume*WIDTH*1.4, 0, 2 * Math.PI);
-        canvasContext.fill()
-        canvasContext.stroke(); 
-
-    // draw a bar based on the current volume
- //   canvasContext.fillRect(0, 0, meter.volume*WIDTH*1.4, HEIGHT);
-
-    // set up the next visual callback
-    rafID = window.requestAnimationFrame( drawLoop );
+  //  ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.globalAlpha = 0.1;
+    ctx.fillStyle = "rgb("+randomR+","+randomB+","+randomG+")";
+    ctx.beginPath();
+    ctx.arc(canvas.width/2, canvas.height/2, meter.volume*3000*1.4, 0, 2 * Math.PI);
+    ctx.fill()
+    ctx.stroke(); 
+    step = window.requestAnimationFrame( volumeCircle );
 }

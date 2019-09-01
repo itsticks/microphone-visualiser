@@ -1,21 +1,25 @@
 <!doctype html>
 <html>
 	<head>
-		<title>Volume Meter Sample</title>
+		<title>Microphone Visualiser</title>
 		<style>
 		</style>
 
 <style>
-body{overflow: hidden;height:100vh; width:100vw;}
+  *{
+    padding:0;
+    margin:0;
+  }
+body{
+  overflow: hidden;
+  height:100vh; 
+  width:100vw;
+  }
 </style>
 
 	</head>
 	<body>
-    <canvas id="meter" width="500" height="50"></canvas>
-    		<!-- Include the volume meter component -->
 		<script src="volume-meter.js?1"></script>
-		<!-- Include the main app logic -->
 		<script src="main.js?1"></script>
-
 	</body>
 </html>
