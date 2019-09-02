@@ -54,7 +54,7 @@ dataArray = new Uint8Array(bufferLength);
   ctx.clearRect(0,0,canvas.width,canvas.height);
     ctx.lineWidth = 2;
     ctx.strokeStyle = 'rgb(0, 0, 0)';
-   // ctx.globalAlpha = 0.1;
+    ctx.globalAlpha = 0.9;
     ctx.fillStyle = "rgb("+randomR+","+randomB+","+randomG+")";
     ctx.beginPath();
     ctx.arc(canvas.width/2, canvas.height/2, volumeMeter.volume*3000*1.4, 0, 2 * Math.PI);
